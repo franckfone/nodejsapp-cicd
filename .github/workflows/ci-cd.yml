@@ -88,14 +88,26 @@ jobs:
         run: npm test
       
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/nodejsapp-cicd:latest .
+        run: |
+          echo "Build started at: $(date -u)"
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/nodejsapp-cicd:latest .
+          echo "Build completed at: $(date -u)"
       
       - name: Login to Docker Hub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
       
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/nodejsapp-cicd:latest
+        run: |
+          echo "Push started at: $(date -u)"
+          docker push ${{ secrets.DOCKER_USERNAME }}/nodejsapp-cicd:latest
+          echo "Push completed at: $(date -u)"
       
+      - name: Get Docker image checksum
+        run: |
+          IMAGE_ID=$(docker images ${{ secrets.DOCKER_USERNAME }}/nodejsapp-cicd:latest -q)
+          CHECKSUM=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE_ID)
+          echo "Docker image checksum: $CHECKSUM"
+
       - name: Run static code analysis with semgrep
         uses: returntocorp/semgrep-action@v1
       
