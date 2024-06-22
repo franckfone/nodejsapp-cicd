@@ -45,7 +45,7 @@ jobs:
           echo "Docker image checksum: $CHECKSUM"
 
       - name: Run static code analysis with semgrep
-        uses: returntocorp/semgrep-action@v1.5.1  
+        uses: returntocorp/semgrep-action@v1.5.2  # Mise à jour de la version
       
       - name: Lint Dockerfile
         run: docker run --rm -i hadolint/hadolint < Dockerfile
