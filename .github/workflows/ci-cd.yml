@@ -1,77 +1,13 @@
-name: CI/CD Pipeline
+name: CD - Build et Déploiement
 
 on:
   push:
     branches:
       - main
-      - 'feature/*'
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12.x, 14.x, 16.x]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-      
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Run unit tests
-        run: npm test
-
-  static-analysis:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14.x'
-      
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Run static code analysis with semgrep
-        uses: returntocorp/semgrep-action@v1
-      
-      - name: Lint Dockerfile
-        run: docker run --rm -i hadolint/hadolint < Dockerfile
-
-  security-scan:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Setup Trivy
-        run: |
-          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install trivy -y
-
-      - name: Scan for vulnerabilities
-        run: trivy fs .
-
   build-and-deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
