@@ -10,10 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      
+        uses: actions/checkout@v3  
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3 
         with:
           node-version: '14.x'
       
@@ -21,7 +20,7 @@ jobs:
         run: npm install
       
       - name: Run static code analysis with semgrep
-        uses: returntocorp/semgrep-action@v1
+        uses: returntocorp/semgrep-action@v1.5.1  
       
       - name: Lint Dockerfile
         run: docker run --rm -i hadolint/hadolint < Dockerfile
